@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+    <h1 style="font-family:'Merriweather',serif; border-bottom: 2px solid #cc0000; padding-bottom: 10px; margin-bottom: 20px;">Kategori: {{ category }}</h1>
+    {% for article in articles %}
+        {% if article.image_path %}{% set img = url_for('static', filename=article.image_path) %}
+        {% elif article.image_url %}{% set img = article.image_url %}
+        {% else %}{% set img = 'https://picsum.photos/seed/' + article.id|string + '/400/300' %}{% endif %}
+        <div style="padding: 15px 0; border-bottom: 1px solid #eee; display: flex; gap: 15px;">
+            <img src="{{ img }}" style="width: 120px; height: 80px; object-fit: cover; border-radius: 4px;" onerror="this.src='https://picsum.photos/seed/{{ article.id + 99 }}/400/300';">
+            <div style="flex: 1;">
+                <span class="cat">{% if article.is_auto %}AUTO{% else %}REDAKSI{% endif %}</span>
+                <h3 style="font-size: 17px; margin: 3px 0;"><a href="/baca/{{ article.id }}" style="color:#111; text-decoration:none;">{{ article.title }}</a></h3>
+                <div class="meta">{{ article.created_at }}</div>
+            </div>
+        </div>
+    {% else %}
+    <p style="color:#888; padding: 40px 0;">Belum ada berita di kategori ini.</p>
+    {% endfor %}
+{% endblock %}
