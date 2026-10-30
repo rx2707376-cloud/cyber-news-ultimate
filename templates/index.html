@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+    {% for article in articles %}
+        {% if article.image_path %}
+            {% set img = url_for('static', filename=article.image_path) %}
+        {% elif article.image_url %}
+            {% set img = article.image_url %}
+        {% else %}
+            {% set img = 'https://picsum.photos/seed/' + article.id|string + '/800/450' %}
+        {% endif %}
+
+        {% if loop.first %}
+            <div class="headline">
+                <img src="{{ img }}" alt="{{ article.title }}" onerror="this.src='https://picsum.photos/seed/{{ article.id + 99 }}/800/450';">
+                <span class="cat">{{ article.category }} • {% if article.is_auto %}AUTO{% else %}REDAKSI{% endif %}</span>
+                <h1><a href="/baca/{{ article.id }}">{{ article.title }}</a></h1>
+                <div class="meta">{{ article.created_at }}{% if article.source %} | Sumber: {{ article.source }}{% endif %}</div>
+            </div>
+            <div class="grid">
+        {% else %}
+            {% if loop.index <= 7 %}
+                <div class="card">
+                    <img src="{{ img }}" alt="{{ article.title }}" onerror="this.src='https://picsum.photos/seed/{{ article.id + 99 }}/400/300';">
+                    <span class="cat">{{ article.category }} • {% if article.is_auto %}AUTO{% else %}REDAKSI{% endif %}</span>
+                    <h3><a href="/baca/{{ article.id }}">{{ article.title }}</a></h3>
+                    <div class="meta">{{ article.created_at }}{% if article.source %} | {{ article.source }}{% endif %}</div>
+                </div>
+            {% endif %}
+        {% endif %}
+    {% else %}
+        <p style="text-align:center; padding:40px; color:#888;">Belum ada berita. Klik tombol <b>🔄 TARIK BERITA</b> di atas atau tambahkan berita dari menu Admin.</p>
+    {% endfor %}
+    {% if articles|length > 1 %}</div>{% endif %}
+
+    {% if articles|length > 7 %}
+        <div style="margin-top: 30px; border-top: 2px solid #111; padding-top: 15px;">
+            <h3 style="font-size: 16px; margin-bottom: 10px;">BERITA LAINNYA</h3>
+            {% for article in articles[7:] %}
+            <div style="padding: 12px 0; border-bottom: 1px solid #eee;">
+                <span class="cat">{{ article.category }} • {% if article.is_auto %}AUTO{% else %}REDAKSI{% endif %}</span>
+                <h3 style="font-size: 16px; margin: 3px 0;"><a href="/baca/{{ article.id }}" style="color:#111; text-decoration:none;">{{ article.title }}</a></h3>
+                <div class="meta">{{ article.created_at }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endblock %}
