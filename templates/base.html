@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber News - Portal Berita Terkini</title>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: #050505; color: #333; line-height: 1.6; }
+        #matrix-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; opacity: 0.15; pointer-events: none; }
+        .site { position: relative; z-index: 10; max-width: 1100px; margin: 0 auto; background: #fff; min-height: 100vh; box-shadow: 0 0 40px rgba(0,0,0,0.8); }
+        .topbar { background: #cc0000; color: #fff; text-align: center; font-size: 12px; padding: 6px; font-weight: 600; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 3px solid #cc0000; }
+        .logo { font-family: 'Merriweather', serif; font-size: 34px; font-weight: 900; color: #cc0000; letter-spacing: -1px; }
+        .logo span { color: #111; }
+        .navbar { background: #111; }
+        .navbar ul { list-style: none; display: flex; overflow-x: auto; white-space: nowrap; }
+        .navbar a { display: block; color: #fff; text-decoration: none; padding: 12px 18px; font-size: 13px; font-weight: 600; text-transform: uppercase; }
+        .navbar a:hover, .navbar a.active { background: #cc0000; }
+        .nav-refresh { background: #00aa44 !important; }
+        .layout { display: grid; grid-template-columns: 1fr; gap: 20px; padding: 20px; }
+        @media (min-width: 768px) { .layout { grid-template-columns: 2fr 1fr; } }
+        .headline { margin-bottom: 30px; }
+        .headline img { width: 100%; border-radius: 6px; margin-bottom: 15px; }
+        .cat { color: #cc0000; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        .headline h1 { font-family: 'Merriweather', serif; font-size: 30px; line-height: 1.3; margin: 10px 0; }
+        .headline h1 a { color: #111; text-decoration: none; }
+        .headline h1 a:hover { color: #cc0000; }
+        .grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+        @media (min-width: 600px) { .grid { grid-template-columns: 1fr 1fr; } }
+        .card { border-top: 2px solid #eee; padding-top: 15px; }
+        .card img { width: 100%; height: 150px; object-fit: cover; border-radius: 4px; margin-bottom: 10px; }
+        .card h3 { font-size: 17px; font-weight: 700; line-height: 1.4; margin: 5px 0; }
+        .card h3 a { color: #111; text-decoration: none; }
+        .card h3 a:hover { color: #cc0000; }
+        .meta { font-size: 11px; color: #888; margin-top: 5px; }
+        .sidebar h3 { font-size: 15px; font-weight: 800; border-bottom: 3px solid #cc0000; padding-bottom: 8px; margin-bottom: 15px; }
+        .pop { display: flex; gap: 10px; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px dashed #eee; }
+        .pop-num { font-size: 22px; font-weight: 900; color: #cc0000; }
+        .pop-t { font-size: 13px; font-weight: 600; }
+        .pop-t a { color: #111; text-decoration: none; }
+        .pop-t a:hover { color: #cc0000; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 5px; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-family: inherit; }
+        .btn { background: #cc0000; color: #fff; padding: 12px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; font-size: 16px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; }
+        th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: left; }
+        th { background: #f4f4f4; }
+    </style>
+</head>
+<body>
+    <canvas id="matrix-canvas"></canvas>
+    <div class="site">
+        <div class="topbar">Aktual • Faktual • Berimbang</div>
+        <div class="header">
+            <div class="logo">CYBER<span>NEWS</span></div>
+            <div style="font-size: 12px; color:#666;">Portal Berita Cerdas</div>
+        </div>
+        <div class="navbar">
+            <ul>
+                <li><a href="/" class="{{ 'active' if request.path == '/' else '' }}">HOME</a></li>
+                <li><a href="/kategori/NASIONAL" class="{{ 'active' if '/NASIONAL' in request.path else '' }}">NASIONAL</a></li>
+                <li><a href="/kategori/HUKUM" class="{{ 'active' if '/HUKUM' in request.path else '' }}">HUKUM</a></li>
+                <li><a href="/kategori/KORUPSI" class="{{ 'active' if '/KORUPSI' in request.path else '' }}">KORUPSI</a></li>
+                <li><a href="/kategori/KRIMINAL" class="{{ 'active' if '/KRIMINAL' in request.path else '' }}">KRIMINAL</a></li>
+                <li><a href="/kategori/DAERAH" class="{{ 'active' if '/DAERAH' in request.path else '' }}">DAERAH</a></li>
+                <li><a href="/refresh" class="nav-refresh">🔄 TARIK BERITA</a></li>
+                <li><a href="/admin">🔒 ADMIN</a></li>
+            </ul>
+        </div>
+        <div class="layout">
+            <div class="main">{% block content %}{% endblock %}</div>
+            <div class="sidebar">
+                <h3>BERITA TERPOPULER</h3>
+                {% for p in popular %}
+                <div class="pop">
+                    <div class="pop-num">{{ loop.index }}</div>
+                    <div class="pop-t"><a href="/baca/{{ p.id }}">{{ p.title }}</a></div>
+                </div>
+                {% else %}
+                <p style="font-size:12px; color:#888;">Belum ada data.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <script>
+        const c = document.getElementById('matrix-canvas'), x = c.getContext('2d');
+        c.width = window.innerWidth; c.height = window.innerHeight;
+        const a = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''), fs = 16, col = c.width/fs, dr = [];
+        for (let i=0; i<col; i++) dr[i]=1;
+        setInterval(() => {
+            x.fillStyle='rgba(5,5,5,0.05)'; x.fillRect(0,0,c.width,c.height);
+            x.fillStyle='#00ff41'; x.font=fs+'px monospace';
+            for (let i=0; i<dr.length; i++) {
+                x.fillText(a[Math.floor(Math.random()*a.length)], i*fs, dr[i]*fs);
+                if (dr[i]*fs > c.height && Math.random() > 0.975) dr[i]=0;
+                dr[i]++;
+            }
+        }, 35);
+    </script>
+</body>
+</html>
